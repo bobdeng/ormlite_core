@@ -3,11 +3,11 @@ package com.j256.ormlite.field.types;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.misc.SqlExceptionUtil;
 import com.j256.ormlite.support.DatabaseResults;
+import com.palmwin.proxy.JsonProxy;
 
 /**
  * Persists an unknown Java Object that is {@link java.io.Serializable}.
@@ -17,7 +17,6 @@ import com.j256.ormlite.support.DatabaseResults;
 public class ObjectType extends BaseDataType {
 
 	private static final ObjectType singleTon = new ObjectType();
-    private static final ObjectMapper mapper = new ObjectMapper();
 	public static ObjectType getSingleton() {
 		return singleTon;
 	}
@@ -54,7 +53,7 @@ public class ObjectType extends BaseDataType {
 			if(str==null){
 				return fieldType.getField().getType().newInstance();
 			}
-            return mapper.readValue(str, fieldType.getField().getType());
+            return JsonProxy.fromJson(str, fieldType.getField().getType());
 		} catch (Exception e) {
 			try {
 				return fieldType.getField().getType().newInstance();
@@ -71,7 +70,7 @@ public class ObjectType extends BaseDataType {
 			{
 				return null;
 			}
-            return mapper.writeValueAsString(obj);
+            return JsonProxy.toJson(obj);
 		} catch (Exception e) {
 			throw SqlExceptionUtil.create("Could not write JsonObject object : " + obj, e);
         }
@@ -111,7 +110,7 @@ public class ObjectType extends BaseDataType {
         	if(stringValue==null){
         		return fieldType.getField().getType().newInstance();
         	}
-            return mapper.readValue(stringValue, fieldType.getField().getType());
+            return JsonProxy.fromJson(stringValue, fieldType.getField().getType());
         } catch (Exception e) {
         	try {
 				return fieldType.getField().getType().newInstance();
